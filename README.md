@@ -1,302 +1,182 @@
 # AWS Cloud Security Assessment & Misconfiguration Hunt
 
-A hands-on cloud security project focused on identifying, assessing, remediating, and validating security weaknesses within a controlled **Amazon Web Services (AWS)** environment.
+A hands-on AWS security portfolio project documenting the identification, validation, remediation, and retesting of cloud-security weaknesses in a controlled lab environment.
 
-The project simulates a professional cloud security assessment and demonstrates practical skills across **AWS security, Identity and Access Management (IAM), least-privilege design, security logging, misconfiguration analysis, risk assessment, remediation, and security validation**.
+Rather than presenting configuration screenshots alone, each case follows a repeatable assessment workflow:
 
-> **Environment:** Personal AWS lab containing only controlled test resources and synthetic data.
+```text
+Identify → Validate Effective Access/Exposure → Assess Risk
+        → Remediate → Retest → Document Evidence
+```
 
----
-
-## Project Objectives
-
-The objectives of this project are to:
-
-* Build a controlled AWS environment for security testing
-* Identify cloud security misconfigurations
-* Assess IAM users, roles, policies, and permissions
-* Detect excessive and unused privileges
-* Apply least-privilege access principles
-* Analyze AWS activity using CloudTrail
-* Use IAM Access Analyzer to evaluate access and policy risks
-* Perform automated cloud-security assessments
-* Prioritize findings according to technical and business risk
-* Remediate identified weaknesses
-* Validate security improvements after remediation
-* Produce technical and executive-level security documentation
+> **Environment:** Personally controlled AWS lab using synthetic/non-sensitive data only.
 
 ---
 
-## Skills Demonstrated
+## Project Summary
 
-* AWS Cloud Security
-* Identity and Access Management (IAM)
-* Least-Privilege Access Control
-* Cloud Security Assessments
-* Cloud Misconfiguration Analysis
-* AWS CloudTrail
-* IAM Access Analyzer
-* Security Logging and Monitoring
-* Security Control Validation
-* Risk Assessment
-* Vulnerability Prioritization
-* Remediation Planning
-* Security Architecture
-* Technical Documentation
-* Executive Risk Communication
+This project contains **six completed AWS security findings** spanning identity, resource-based authorization, network exposure, stale entitlements, and security telemetry.
+
+| ID | Finding | Domain | Severity | Status |
+|---|---|---|---|---|
+| [AWS-01](findings/AWS-01-excessive-iam-permissions/) | Excessive IAM permissions assigned to `DeveloperRole` | IAM / S3 | High | ✅ Remediated & Validated |
+| [AWS-02](findings/AWS-02-Wildcard%20Resource%20Permissions%20in%20a%20Custom%20IAM%20Policy/) | Wildcard resource permissions in a custom IAM policy | IAM / S3 | High | ✅ Remediated & Validated |
+| [AWS-03](findings/AWS-03-Unused%20Stale%20IAM%20Permissions/) | Unused/stale DynamoDB permissions on a legacy role | IAM | Medium | ✅ Remediated & Validated |
+| [AWS-04](findings/AWS-04-Unintended%20Access%20Through%20an%20S3%20Bucket%20Policy/) | Unintended S3 access through a resource-based policy | S3 / IAM | High | ✅ Remediated & Validated |
+| [AWS-05](findings/AWS-05-Overly%20Permissive%20Security%20Group%20Exposing%20SSH/) | SSH exposed to `0.0.0.0/0` | EC2 / Network | High | ✅ Remediated & Validated |
+| [AWS-06](findings/AWS-06-CloudTrail%20Logging%20Gap%20Detection%20Visibility%20Failure/) | Missing S3 object-level audit visibility | CloudTrail / S3 | Medium | ✅ Remediated & Validated |
+
+**Completed findings:** 6  
+**High severity:** 4  
+**Medium severity:** 2  
+**Validated remediations:** 6/6
 
 ---
 
-## Technologies
+## What This Project Demonstrates
 
-| Technology          | Purpose                                                   |
-| ------------------- | --------------------------------------------------------- |
-| AWS IAM             | Identity, roles, permissions, and access-control analysis |
-| Amazon S3           | Cloud storage security assessment                         |
-| Amazon EC2          | Compute and network-security testing                      |
-| AWS CloudTrail      | API and account activity logging                          |
-| IAM Access Analyzer | External access, policy, and privilege analysis           |
-| AWS Security Groups | Network-access control assessment                         |
-| Prowler             | Automated AWS security assessment                         |
-| AWS CLI             | Cloud administration and evidence collection              |
-| Git / GitHub        | Version control and project documentation                 |
+### Identity & Access Management
+- IAM role and policy analysis
+- Effective-permission validation
+- Least-privilege redesign
+- Wildcard-resource reduction
+- Stale entitlement removal
+- Service last-accessed analysis
+- Resource-based vs. identity-based authorization
+
+### Cloud & Network Security
+- S3 bucket-policy assessment
+- EC2 security-group review
+- Public management-plane exposure analysis
+- CIDR-based source restriction
+- Attack-surface reduction
+
+### SOC / Detection Visibility
+- CloudTrail management-event review
+- S3 data-event configuration
+- Controlled activity generation
+- `GetObject` telemetry validation
+- Audit-gap identification
+- Investigation-oriented evidence collection
+
+### Security Assessment Practice
+- Before/after evidence collection
+- Root-cause analysis
+- Likelihood/impact assessment
+- Remediation implementation
+- Post-remediation testing
+- Technical and executive reporting
 
 ---
 
 ## Assessment Methodology
 
-The project follows a structured security-assessment workflow:
+Every case uses the same evidence-driven process:
 
 ```text
-Environment Build
-       ↓
-Asset Discovery
-       ↓
-Configuration Review
-       ↓
-Misconfiguration Identification
-       ↓
-Evidence Collection
-       ↓
-Risk Assessment
-       ↓
-Finding Prioritization
-       ↓
-Remediation
-       ↓
-Security Validation
-       ↓
-Final Reporting
+1. Define intended access/security state
+                ↓
+2. Inspect current configuration
+                ↓
+3. Test effective access or exposure
+                ↓
+4. Document the finding and risk
+                ↓
+5. Implement a scoped remediation
+                ↓
+6. Repeat the original test
+                ↓
+7. Validate required functionality
+                ↓
+8. Record final status and lessons learned
 ```
 
-Each security finding is documented with:
-
-* Finding ID
-* Description
-* Affected resource
-* Evidence
-* Security impact
-* Likelihood
-* Severity
-* Relevant security principle
-* Recommended remediation
-* Remediation actions
-* Validation evidence
-* Final status
+This is important because a policy that *looks* restrictive is not necessarily restrictive in practice, and a remediation is not complete until its effect is tested.
 
 ---
 
-## Lab Architecture
+## Findings at a Glance
 
-The initial AWS lab contains:
+### AWS-01 — Excessive IAM Permissions
+
+`DeveloperRole` originally received AWS-managed `AmazonS3FullAccess`, allowing access beyond its intended project bucket.
+
+**Remediation:** Replaced broad managed permissions with a resource-scoped custom policy and validated that intended S3 operations continued while control-bucket access was denied.
+
+**Key concept:** Least privilege and blast-radius reduction.
+
+---
+
+### AWS-02 — Wildcard Resource Permissions
+
+`ReportReaderRole` used a custom policy whose S3 permissions were scoped to `"Resource": "*"`, allowing reads from unrelated buckets.
+
+**Remediation:** Replaced wildcard scope with explicit bucket and object ARNs. Required reports access remained functional while unrelated buckets became inaccessible.
+
+**Key concept:** Action scope is only half of least privilege; resource scope matters equally.
+
+---
+
+### AWS-03 — Unused / Stale IAM Permissions
+
+`LegacyAppRole` contained required S3 permissions plus DynamoDB permissions that were not used during the tracking period.
+
+**Remediation:** Removed the unnecessary DynamoDB actions while preserving required S3 access and verified the service disappeared from the role's allowed-service footprint.
+
+**Key concept:** Entitlement drift and periodic access review.
+
+---
+
+### AWS-04 — Resource-Based S3 Authorization
+
+`DataAnalystRole` had no attached S3 identity policy, yet it could read finance data because the S3 bucket policy explicitly granted the role access.
+
+**Remediation:** Removed the unintended resource-policy authorization and confirmed both bucket listing and object access were denied afterward.
+
+**Key concept:** `No attached IAM policy` does **not** mean `no effective access`.
+
+---
+
+### AWS-05 — Internet-Exposed SSH
+
+A publicly addressed EC2 instance used a security group permitting:
 
 ```text
-                    AWS Account
-                         │
-             ┌───────────┴───────────┐
-             │                       │
-            IAM                  CloudTrail
-             │                       │
-      ┌──────┼──────┐                │
-      │      │      │                ↓
- Developer Security Auditor      Activity Logs
-   Role     Role    Role
-      │
-      ├──────────────┐
-      │              │
-      ↓              ↓
-     S3             EC2
-      │              │
-      └──── Security Groups
+SSH / TCP 22 / 0.0.0.0/0
 ```
 
-The environment will intentionally contain controlled security weaknesses that are documented and remediated during the assessment.
+**Remediation:** Restricted SSH to a trusted `/32` administrative source and confirmed the remediated security group remained attached to the instance.
+
+**Key concept:** A required service does not need to be reachable from everywhere.
 
 ---
 
-## Planned Security Findings
+### AWS-06 — CloudTrail S3 Data-Event Visibility Gap
 
-| ID     | Finding                            | Area    | Initial Status |
-| ------ | ---------------------------------- | ------- | -------------- |
-| AWS-01 | Excessive IAM permissions          | IAM     | Planned        |
-| AWS-02 | Wildcard resource permissions      | IAM     | Planned        |
-| AWS-03 | Unused or unnecessary access       | IAM     | Planned        |
-| AWS-04 | S3 access-control misconfiguration | Storage | Planned        |
-| AWS-05 | Overly permissive security group   | Network | Planned        |
-| AWS-06 | Security logging or monitoring gap | Logging | Planned        |
+Controlled access to `audit-sensitive.txt` was not represented as a `GetObject` event in the standard CloudTrail management-event history.
 
-Additional findings may be added as the assessment develops.
+**Remediation:** Enabled S3 read data-event logging for the audit workload, repeated the access, and confirmed CloudTrail captured a successful `GetObject` data event identifying the role, bucket, key, and request outcome.
+
+**Key concept:** CloudTrail being enabled does not automatically mean all resource-level activity is collected.
 
 ---
 
-## IAM Least-Privilege Assessment
+## Security Concepts Covered
 
-A major component of this project is evaluating excessive AWS permissions and redesigning access according to the **principle of least privilege**.
-
-Example:
-
-### Initial Permission Model
-
-```text
-DeveloperRole
-      │
-      ↓
-Broad S3 Permissions
-      │
-      ↓
-Multiple AWS Resources
-```
-
-### Remediated Model
-
-```text
-DeveloperRole
-      │
-      ↓
-Required S3 Actions Only
-      │
-      ↓
-Specific Project Resources
-```
-
-The remediated design aims to reduce unnecessary privileges and minimize the potential impact of credential compromise.
-
----
-
-## Findings
-
-Detailed findings are maintained in the [`findings/`](findings/) directory.
-
-Each finding contains the complete analyst reasoning process from discovery through remediation and validation.
-
-Example:
-
-```text
-AWS-01
-Excessive IAM Permissions Assigned to Developer Role
-
-Severity: High
-
-Status:
-Identified → Assessed → Remediated → Validated
-```
-
----
-
-## Automated Security Assessment
-
-The project also incorporates automated cloud-security assessment using **Prowler**.
-
-Automated findings are not accepted blindly.
-
-Results are manually reviewed to determine:
-
-* Whether the finding is valid
-* Actual exposure
-* Potential impact
-* Environmental context
-* Remediation priority
-* False-positive considerations
-
-This ensures the project demonstrates **security analysis**, rather than simply running a scanning tool.
-
----
-
-## Risk Assessment
-
-Findings are evaluated using factors including:
-
-* Technical severity
-* Exposure
-* Exploitability
-* Access requirements
-* Potential blast radius
-* Data sensitivity
-* Business impact
-* Existing compensating controls
-
-Example:
-
-| Finding                  | Likelihood | Impact | Priority |
-| ------------------------ | ---------- | ------ | -------- |
-| Excessive IAM privilege  | High       | High   | Critical |
-| Public resource exposure | High       | High   | Critical |
-| Unused permissions       | Medium     | Medium | Moderate |
-| Logging gap              | Medium     | High   | High     |
-
----
-
-## Remediation & Validation
-
-Identifying a weakness is only the first half of the assessment.
-
-For every applicable finding, the project documents:
-
-```text
-Finding
-   ↓
-Root Cause
-   ↓
-Remediation
-   ↓
-Reassessment
-   ↓
-Validation
-   ↓
-Closed / Residual Risk
-```
-
-Post-remediation validation is used to confirm that corrective actions reduced the identified risk without unnecessarily disrupting required functionality.
-
----
-
-## Reporting
-
-The project includes two reporting levels.
-
-### Technical Assessment Report
-
-Designed for security and engineering teams, including:
-
-* Technical evidence
-* IAM policies
-* Configuration analysis
-* CloudTrail activity
-* Security-tool findings
-* Risk analysis
-* Remediation procedures
-* Validation results
-
-### Executive Summary
-
-Designed for management and business stakeholders, summarizing:
-
-* Overall security posture
-* Highest-priority findings
-* Business impact
-* Key remediation actions
-* Residual risks
-* Recommended next steps
+| Concept | Demonstrated In |
+|---|---|
+| Principle of least privilege | AWS-01, AWS-02, AWS-03 |
+| Identity-based policies | AWS-01, AWS-02, AWS-03 |
+| Resource-based policies | AWS-04 |
+| Effective authorization | AWS-01, AWS-02, AWS-04 |
+| Entitlement drift | AWS-03 |
+| IAM service last-accessed data | AWS-03 |
+| Network least privilege | AWS-05 |
+| Security groups / CIDR scope | AWS-05 |
+| CloudTrail management events | AWS-06 |
+| CloudTrail S3 data events | AWS-06 |
+| Detection visibility | AWS-06 |
+| Remediation validation | AWS-01 through AWS-06 |
 
 ---
 
@@ -304,55 +184,123 @@ Designed for management and business stakeholders, summarizing:
 
 ```text
 AWS-Cloud-Security-Assessment/
-├── architecture/
-├── assessment/
+├── README.md
+├── .gitignore
 ├── findings/
+│   ├── README.md
+│   ├── AWS-01-excessive-iam-permissions/
+│   ├── AWS-02-Wildcard Resource Permissions in a Custom IAM Policy/
+│   ├── AWS-03-Unused Stale IAM Permissions/
+│   ├── AWS-04-Unintended Access Through an S3 Bucket Policy/
+│   ├── AWS-05-Overly Permissive Security Group Exposing SSH/
+│   └── AWS-06-CloudTrail Logging Gap Detection Visibility Failure/
 ├── iam/
-├── cloudtrail/
-├── prowler/
-├── remediation/
-├── evidence/
-├── reports/
-└── docs/
+│   ├── insecure-policies/
+│   └── remediated-policies/
+└── reports/
+    └── executive-summary.md
 ```
+
+Each finding contains its own `README.md`, evidence set, and applicable policy/configuration artifacts.
 
 ---
 
-## Project Status
+## IAM Policy Library
 
-**Status:** In Progress
+Reusable before/after policy artifacts are also maintained under [`iam/`](iam/):
 
-### Current Phase
+```text
+iam/
+├── insecure-policies/
+│   ├── FinanceBucketPolicy-Before.json
+│   ├── LegacyAppMixedAccessPolicy.json
+│   └── ReportReaderWildcardPolicy.json
+└── remediated-policies/
+    ├── AuditReaderS3Policy.json
+    ├── DeveloperS3LeastPrivilege.json
+    ├── LegacyAppS3OnlyPolicy.json
+    └── ReportReaderLeastPrivilegePolicy.json
+```
 
-* [ ] Secure AWS lab account
-* [ ] Build initial AWS environment
-* [ ] Configure CloudTrail logging
-* [ ] Configure IAM lab identities
-* [ ] Complete AWS-01 IAM assessment
-* [ ] Perform automated assessment
-* [ ] Remediate findings
-* [ ] Validate remediation
-* [ ] Complete technical report
-* [ ] Complete executive summary
+These policy files make the access-control changes reviewable independently of screenshots.
+
+---
+
+## Assessment Results
+
+All six deliberately introduced findings were remediated and retested.
+
+| Severity | Findings | Remediated |
+|---|---:|---:|
+| Critical | 0 | 0 |
+| High | 4 | 4 |
+| Medium | 2 | 2 |
+| Low | 0 | 0 |
+| **Total** | **6** | **6** |
+
+The project should not be interpreted as a benchmark of a production AWS environment. The weaknesses were intentionally created in an isolated lab to demonstrate assessment methodology and remediation skills.
+
+---
+
+## Executive Reporting
+
+A management-oriented summary is available at:
+
+**[Executive Summary](reports/executive-summary.md)**
+
+Individual case reports contain the technical evidence and analyst reasoning.
+
+---
+
+## Portfolio Takeaways
+
+The six cases collectively demonstrate that cloud-security assessment requires more than checking whether a policy exists.
+
+The key questions are:
+
+```text
+Who can access the resource?
+Through which authorization path?
+From which network source?
+Is the permission still required?
+Is the activity observable?
+Did remediation actually change the effective state?
+```
+
+The project intentionally validates those questions through controlled testing rather than relying solely on configuration inspection.
 
 ---
 
 ## Security & Ethical Scope
 
-All security testing in this repository is performed against:
+All testing was performed against personally controlled AWS resources created for this lab.
 
-* Personally controlled AWS resources
-* Deliberately configured lab systems
-* Synthetic or non-sensitive data
+- Only synthetic/non-sensitive test data was used.
+- No third-party or production systems were tested.
+- No unauthorized scanning was performed.
+- Credentials and private keys are excluded from the repository.
+- Screenshots intended for public publication are sanitized to remove unnecessary account-specific metadata.
+- AWS resources should be stopped or deleted after testing when no longer required to minimize cost and exposure.
 
-No testing is conducted against third-party systems without authorization.
+---
 
-Secrets, credentials, account identifiers, access keys, and sensitive cloud information are excluded from this repository.
+## Future Extensions
+
+The six-case assessment is complete. Possible future extensions are intentionally separated from the completed scope:
+
+- AWS Config / Security Hub control validation
+- Prowler-assisted posture assessment with manual triage
+- GuardDuty detection validation
+- CloudTrail-to-SIEM ingestion
+- detection-as-code for AWS telemetry
+- Terraform-based secure/insecure lab deployment
+
+These are **not represented as completed work in this repository** unless corresponding evidence is later added.
 
 ---
 
 ## Disclaimer
 
-This repository is an educational cybersecurity portfolio project. The AWS environment is intentionally configured with selected security weaknesses for controlled analysis and remediation.
+This repository is an educational cybersecurity portfolio project. The AWS environment intentionally contained selected weaknesses for controlled analysis and remediation.
 
 The project is not affiliated with or endorsed by Amazon Web Services.

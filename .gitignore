@@ -1,0 +1,39 @@
+# AWS credentials and local secrets
+.aws/
+*.pem
+*.ppk
+*.key
+*.p12
+*.pfx
+credentials
+config
+
+# Environment / secret files
+.env
+.env.*
+!.env.example
+*secret*
+*credentials*
+*access-key*
+
+# Terraform state (if added later)
+.terraform/
+*.tfstate
+*.tfstate.*
+crash.log
+
+# Python / tooling
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+
+# OS / editor files
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# Temporary archives and logs
+*.log
+*.tmp
