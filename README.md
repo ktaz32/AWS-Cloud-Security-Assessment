@@ -187,7 +187,6 @@ AWS-Cloud-Security-Assessment/
 ├── README.md
 ├── .gitignore
 ├── findings/
-│   ├── README.md
 │   ├── AWS-01-excessive-iam-permissions/
 │   ├── AWS-02-Wildcard Resource Permissions in a Custom IAM Policy/
 │   ├── AWS-03-Unused Stale IAM Permissions/
@@ -198,8 +197,8 @@ AWS-Cloud-Security-Assessment/
 │   ├── insecure-policies/
 │   └── remediated-policies/
 |── docs/
-│    ├── architecture.md
-│    └── assessment-methodology.md
+│    ├── AWS-Architecture.md
+│    └── AWS-Assessment-Methodology.md
 └── reports/
     └── executive-summary.md
 ```
