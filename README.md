@@ -197,6 +197,9 @@ AWS-Cloud-Security-Assessment/
 ├── iam/
 │   ├── insecure-policies/
 │   └── remediated-policies/
+|── docs/
+│    ├── architecture.md
+│    └── assessment-methodology.md
 └── reports/
     └── executive-summary.md
 ```
